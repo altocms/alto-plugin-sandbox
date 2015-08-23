@@ -139,6 +139,30 @@ class PluginSandbox_ModuleTopic extends PluginSandbox_Inherits_ModuleTopic {
     }
 
     /**
+     * @param ModuleBlog_EntityBlog|int $xBlog
+     * @param array                     $aAdditionalOptions
+     *
+     * @return int|mixed
+     */
+    public function GetCountTopicsSandboxNewByBlog($xBlog, $aAdditionalOptions = array()) {
+
+        $iBlogId = (is_object($xBlog) ? $xBlog->getId() : intval($xBlog));
+        $sCacheKey = 'count_topics_sandbox_blog_' . $iBlogId . '_' . E::UserId();
+
+        if (FALSE === ($iCount = E::ModuleCache()->GetTmp($sCacheKey))) {
+            $aOptions = array('accessible' => true, 'sandbox' => true, 'blog_id' => $iBlogId);
+            if ($aAdditionalOptions && is_array($aAdditionalOptions)) {
+                $aOptions = array_merge($aOptions, $aAdditionalOptions);
+            }
+            $aFilter = $this->GetNamedFilter('new', $aOptions);
+            $iCount = $this->GetCountTopicsByFilter($aFilter);
+            E::ModuleCache()->SetTmp($iCount, $sCacheKey);
+        }
+
+        return $iCount;
+    }
+
+    /**
      * @param ModuleUser_EntityUser|int $xUser
      * @param array                     $aAdditionalOptions
      *
@@ -155,6 +179,30 @@ class PluginSandbox_ModuleTopic extends PluginSandbox_Inherits_ModuleTopic {
                 $aOptions = array_merge($aOptions, $aAdditionalOptions);
             }
             $aFilter = $this->GetNamedFilter('new_all', $aOptions);
+            $iCount = $this->GetCountTopicsByFilter($aFilter);
+            E::ModuleCache()->SetTmp($iCount, $sCacheKey);
+        }
+
+        return $iCount;
+    }
+
+    /**
+     * @param ModuleUser_EntityUser|int $xUser
+     * @param array                     $aAdditionalOptions
+     *
+     * @return int
+     */
+    public function GetCountTopicsSandboxNewByUser($xUser, $aAdditionalOptions = array()) {
+
+        $iUserId = (is_object($xUser) ? $xUser->getId() : intval($xUser));
+        $sCacheKey = 'count_topics_sandbox_user_' . $iUserId . '_' . E::UserId();
+
+        if (FALSE === ($iCount = E::ModuleCache()->GetTmp($sCacheKey))) {
+            $aOptions = array('accessible' => true, 'sandbox' => true, 'user_id' => $iUserId);
+            if ($aAdditionalOptions && is_array($aAdditionalOptions)) {
+                $aOptions = array_merge($aOptions, $aAdditionalOptions);
+            }
+            $aFilter = $this->GetNamedFilter('new', $aOptions);
             $iCount = $this->GetCountTopicsByFilter($aFilter);
             E::ModuleCache()->SetTmp($iCount, $sCacheKey);
         }
