@@ -97,9 +97,50 @@ class PluginSandbox_ModuleTopic extends PluginSandbox_Inherits_ModuleTopic {
         return $iCount;
     }
 
+    public function GetCountTopicsSandbox($aAdditionalOptions = array()) {
+
+        $sCacheKey = 'count_topics_sandbox_all_' . serialize($aAdditionalOptions) . '-' . E::UserId();
+
+        if (FALSE === ($iCount = E::ModuleCache()->GetTmp($sCacheKey))) {
+            $aOptions = array('accessible' => true, 'sandbox' => true);
+            if ($aAdditionalOptions && is_array($aAdditionalOptions)) {
+                $aOptions = array_merge($aOptions, $aAdditionalOptions);
+            }
+            $aFilter = $this->GetNamedFilter('new_all', $aOptions);
+            $iCount = $this->GetCountTopicsByFilter($aFilter);
+            E::ModuleCache()->SetTmp($iCount, $sCacheKey);
+        }
+
+        return $iCount;
+    }
+
+    /**
+     * @param ModuleBlog_EntityBlog|int $xBlog
+     * @param array                     $aAdditionalOptions
+     *
+     * @return int|mixed
+     */
+    public function GetCountTopicsSandboxByBlog($xBlog, $aAdditionalOptions = array()) {
+
+        $iBlogId = (is_object($xBlog) ? $xBlog->getId() : intval($xBlog));
+        $sCacheKey = 'count_topics_sandbox_blog_' . $iBlogId . '_' . E::UserId();
+
+        if (FALSE === ($iCount = E::ModuleCache()->GetTmp($sCacheKey))) {
+            $aOptions = array('accessible' => true, 'sandbox' => true, 'blog_id' => $iBlogId);
+            if ($aAdditionalOptions && is_array($aAdditionalOptions)) {
+                $aOptions = array_merge($aOptions, $aAdditionalOptions);
+            }
+            $aFilter = $this->GetNamedFilter('new_all', $aOptions);
+            $iCount = $this->GetCountTopicsByFilter($aFilter);
+            E::ModuleCache()->SetTmp($iCount, $sCacheKey);
+        }
+
+        return $iCount;
+    }
+
     /**
      * @param ModuleUser_EntityUser|int $xUser
-     * @param array $aAdditionalOptions
+     * @param array                     $aAdditionalOptions
      *
      * @return int
      */
@@ -122,9 +163,9 @@ class PluginSandbox_ModuleTopic extends PluginSandbox_Inherits_ModuleTopic {
     }
 
     /**
-     * @param int $xUser
-     * @param int $iPage
-     * @param int $iPerPage
+     * @param ModuleUser_EntityUser|int $xUser
+     * @param int                       $iPage
+     * @param int                       $iPerPage
      *
      * @return array
      */

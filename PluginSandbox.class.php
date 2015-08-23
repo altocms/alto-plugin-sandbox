@@ -57,6 +57,12 @@ class PluginSandbox extends Plugin {
      */
     public function Deactivate() {
 
+        /** @var ModuleMenu_EntityMenu $oMenu */
+        $oMenu = E::ModuleMenu()->GetMenu('topics');
+        $oMenu->RemoveItemById('plugin_sandbox_topics');
+        E::ModuleMenu()->SaveMenu($oMenu);
+        E::ModuleMenu()->ClearMenuCache('topics');
+
         return true;
     }
 
@@ -67,9 +73,6 @@ class PluginSandbox extends Plugin {
 
         defined('TOPIC_STATUS_SANDBOX') || define('TOPIC_STATUS_SANDBOX', 20);
         E::ModuleViewer()->AppendScript(Plugin::GetTemplatePath(__CLASS__) . 'assets/js/sandbox.js');
-        /* !!! */
-        //E::ModuleMenu()->ClearMenuCache('topics');
-        //E::ModuleMenu()->ResetMenu('topics');
 
         return true;
     }
