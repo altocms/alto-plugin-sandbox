@@ -8,11 +8,11 @@
         <lang name="default">Alto CMS Team</lang>
     </author>
     <homepage>http://altocms.com</homepage>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <dirname>sandbox</dirname>
     <requires>
         <alto>
-            <version>1.1.5</version>
+            <version>1.1.6</version>
         </alto>
         <system>
             <php>5.3.0</php>
