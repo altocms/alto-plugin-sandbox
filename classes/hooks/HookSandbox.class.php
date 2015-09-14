@@ -21,7 +21,8 @@ class PluginSandbox_HookSandbox extends Hook {
     public function RegisterHook() {
 
         // Хуки для меню
-        $this->AddHook('module_menu_preparemenus_after', 'onAfterModuleMenuPrepareMenus');
+        $this->AddHook('module_menu_createmenu_after', 'onAfterModuleMenuCreate');
+        $this->AddHook('module_menu_resetmenu_after', 'onAfterModuleMenuReset');
         $this->AddHook('new_sandbox_count', 'newSandboxCount');
         $this->AddHook('render_init_start', 'renderInitStart');
 
@@ -29,38 +30,71 @@ class PluginSandbox_HookSandbox extends Hook {
         $this->AddHookTemplate('menu_blog_blog_item', Plugin::GetTemplateDir(__CLASS__) . '/tpls/menu_blog_item.tpl');
     }
 
-    public function onAfterModuleMenuPrepareMenus() {
+    /**
+     * @param ModuleMenu_EntityMenu $oMenu
+     */
+    protected function _addMenuItem($oMenu) {
+
+        // Создадим элемент меню
+        $oMenuItem = E::ModuleMenu()->CreateMenuItem('plugin.sandbox.topics', array(
+            'text' => array(
+                '{{plugin.sandbox.menu_text}}',
+                'hook:new_sandbox_count' => array(
+                    'red'
+                ),
+            ),
+            'link'    => R::GetPath('index/sandbox'),
+            'active'  => array('topic_kind' => array('sandbox')),
+            'options' => array(
+                'class' => '',
+                'link_title' => '{{plugin.sandbox.menu_text}}',
+            ),
+        ));
+
+        // Добавим в меню
+        $oMenu->AddItem($oMenuItem);
+
+        // Сохраним
+        E::ModuleMenu()->SaveMenu($oMenu);
+    }
+
+    /**
+     * Hook after ModuleMenu::CreateMenu()
+     */
+    public function onAfterModuleMenuCreate() {
 
         /** @var ModuleMenu_EntityMenu $oMenu */
-        $oMenu = E::ModuleMenu()->GetMenu('topics');
+        $oMenu = $this->GetSourceResult();
+        if ($oMenu && $oMenu->getId() == 'topics') {
 
-        // Проверим наличие пункта меню
-        if ($oMenu && !$oMenu->GetItemById('plugin_sandbox_topics')) {
-
-            // Создадим элемент меню
-            $oMenuItem = E::ModuleMenu()->CreateMenuItem('plugin_sandbox_topics', array(
-                'text' => array(
-                    '{{plugin.sandbox.menu_text}}',
-                    'hook:new_sandbox_count' => array(
-                        'red'
-                    ),
-                ),
-                'link'    => R::GetPath('index/sandbox'),
-                'active'  => array('topic_kind' => array('sandbox')),
-                'options' => array(
-                    'class' => '',
-                    'link_title' => '{{plugin.sandbox.menu_text}}',
-                ),
-            ));
-
-            // Добавим в меню
-            $oMenu->AddItem('last', $oMenuItem);
-
-            // Сохраним
-            E::ModuleMenu()->SaveMenu($oMenu);
+            // Проверим наличие пункта меню
+            if (!$oMenu->GetItemById('plugin.sandbox.topics')) {
+                if ($oMenu->GetItemById('plugin_sandbox_topics')) {
+                    $oMenu->RemoveItemById('plugin_sandbox_topics', false);
+                }
+                $this->_addMenuItem($oMenu);
+            }
         }
     }
 
+    /**
+     * Hook after ModuleMenu::ResetMenu()
+     */
+    public function onAfterModuleMenuReset() {
+
+        $oMenu = $this->GetHookArgument(0);
+        if ($oMenu && $oMenu->getId() == 'topics') {
+            if (!$oMenu->GetItemById('plugin.sandbox.topics')) {
+                $this->_addMenuItem($oMenu);
+            }
+        }
+    }
+
+    /**
+     * @param string $sCssClass
+     *
+     * @return int|string
+     */
     public function newSandboxCount($sCssClass = '') {
 
         $iCount = E::ModuleTopic()->GetCountTopicsSandboxNew();

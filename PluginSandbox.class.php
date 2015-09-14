@@ -60,8 +60,9 @@ class PluginSandbox extends Plugin {
         /** @var ModuleMenu_EntityMenu $oMenu */
         $oMenu = E::ModuleMenu()->GetMenu('topics');
         $oMenu->RemoveItemById(array('plugin.sandbox.topics', 'plugin_sandbox_topics'), true);
-        //E::ModuleMenu()->SaveMenu($oMenu);
+        E::ModuleMenu()->SaveMenu($oMenu);
         //E::ModuleMenu()->ClearMenuCache('topics');
+        //Config::ResetCustomConfig('plugin.sandbox');
 
         return true;
     }
