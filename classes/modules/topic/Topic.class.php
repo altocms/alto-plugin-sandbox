@@ -22,7 +22,7 @@ class PluginSandbox_ModuleTopic extends PluginSandbox_Inherits_ModuleTopic {
         $aFilter = parent::GetTopicsFilter();
         if (R::GetAction() == 'index' && R::GetActionEvent() == 'sandbox') {
             $aFilter['topic_status'] = TOPIC_STATUS_SANDBOX;
-        } else {
+        } elseif (!(R::GetAction() == 'content' && R::GetActionEvent() == 'drafts')) {
             $aFilter['topic_status_not'] = TOPIC_STATUS_SANDBOX;
         }
         return $aFilter;
