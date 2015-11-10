@@ -28,7 +28,7 @@ class PluginSandbox_ActionBlog extends PluginSandbox_Inherits_ActionBlog {
 
     protected function EventShowBlog() {
 
-        parent::EventShowBlog();
+        return parent::EventShowBlog();
     }
 
     public function EventShutdown() {
