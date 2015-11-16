@@ -25,6 +25,7 @@ class PluginSandbox_HookSandbox extends Hook {
         $this->AddHook('module_menu_resetmenu_after', 'onAfterModuleMenuReset');
         $this->AddHook('new_sandbox_count', 'newSandboxCount');
         $this->AddHook('render_init_start', 'renderInitStart');
+        $this->AddHook('comment_add_after','clearSandboxCache');
 
         $this->AddHookTemplate('menu_profile_created_item', Plugin::GetTemplateDir(__CLASS__) . '/tpls/menu_profile_created_item.tpl');
         $this->AddHookTemplate('menu_blog_blog_item', Plugin::GetTemplateDir(__CLASS__) . '/tpls/menu_blog_item.tpl');
@@ -130,6 +131,10 @@ class PluginSandbox_HookSandbox extends Hook {
             );
             C::Set('widgets.stream.params.items', $aStreamWidgetItems);
         }
+    }
+
+    public function clearSandboxCache(){
+        E::ModuleCache()->CleanByTags(array("comment_online_update_sandbox"));
     }
 
 }
