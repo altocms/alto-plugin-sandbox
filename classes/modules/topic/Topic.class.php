@@ -245,6 +245,16 @@ class PluginSandbox_ModuleTopic extends PluginSandbox_Inherits_ModuleTopic {
         }
         return $aTopics;
     }
+
+    /**
+     * @param ModuleTopic_EntityTopic $oTopic
+     */
+    public function UpdateTopic($oTopic) {
+
+        $bResult = parent::UpdateTopic($oTopic);
+        E::ModuleCache()->CleanByTags(array('comment_online_update_sandbox', 'comment_online_update_topic'));
+        return $bResult;
+    }
 }
 
 // EOF
